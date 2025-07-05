@@ -4,8 +4,7 @@ public class FoodEater : MonoBehaviour
 {
     public string expectedFoodType = "purple";
     public GameObject reactionPrefab;
-
-    public Transform characterRoot; // Gốc của toàn bộ nhân vật (ví dụ: SushiCharacter)
+    public Transform characterRoot;
 
     public void TryEat(string incomingType)
     {
@@ -18,7 +17,7 @@ public class FoodEater : MonoBehaviour
                 Instantiate(reactionPrefab, characterRoot.position, Quaternion.identity);
             }
 
-            Destroy(characterRoot.gameObject); // Xoá toàn bộ nhân vật
+            Destroy(characterRoot.gameObject);
         }
         else
         {
@@ -26,3 +25,5 @@ public class FoodEater : MonoBehaviour
         }
     }
 }
+
+

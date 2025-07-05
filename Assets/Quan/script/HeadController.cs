@@ -17,8 +17,6 @@ public class SushiHeadController : MonoBehaviour
     {
         basePos = transform.localPosition;
         baseRot = transform.localRotation;
-
-        StartIdleMotion(); // 👈 Bắt đầu nhún ngay từ đầu
     }
 
     public void StartIdleMotion()

@@ -2,14 +2,21 @@
 
 public class FoodBox : MonoBehaviour
 {
-    public string foodType = "purple";
+    public string foodType = "purple"; // Loại của đồ ăn này
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        var eater = other.GetComponent<FoodEater>();
-        if (eater != null)
+        FoodPoint foodPoint = other.GetComponent<FoodPoint>();
+
+        if (foodPoint != null)
         {
-            eater.TryEat(foodType);
+            bool wasEaten = foodPoint.TryFeedWithFood(foodType);
+
+            if (wasEaten)
+            {
+                Destroy(gameObject); // Chỉ xoá FoodBox nếu ăn thành công
+            }
         }
     }
+
 }

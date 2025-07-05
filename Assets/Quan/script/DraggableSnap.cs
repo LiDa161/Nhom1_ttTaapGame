@@ -3,14 +3,16 @@ using System.Collections;
 
 public class DraggableSnap : MonoBehaviour
 {
-    public Transform[] anchorPoints; // Nhiều điểm neo
-    public float snapThreshold = 3f;
+    public Transform[] anchorPoints;
+    public float snapThreshold = 1f;
     public float snapSpeed = 5f;
+    public AnchorSlot[] anchorSlots; // Phải tương ứng với anchorPoints
 
     private Vector3 offset;
     private bool isDragging = false;
     private bool isSnapped = false;
     private Transform currentSnapPoint = null;
+    private AnchorSlot currentSlot = null;
 
     public bool IsSnapped => isSnapped;
 
@@ -18,6 +20,10 @@ public class DraggableSnap : MonoBehaviour
     {
         isDragging = true;
         offset = transform.position - GetMouseWorldPos();
+
+        // Clear slot cũ nếu có
+        currentSlot?.ClearCharacter();
+        currentSlot = null;
     }
 
     void OnMouseDrag()
@@ -33,23 +39,26 @@ public class DraggableSnap : MonoBehaviour
         isDragging = false;
 
         float closestDist = float.MaxValue;
-        Transform closestAnchor = null;
+        int closestIndex = -1;
 
-        foreach (var anchor in anchorPoints)
+        for (int i = 0; i < anchorPoints.Length; i++)
         {
-            float dist = Vector3.Distance(transform.position, anchor.position);
+            float dist = Vector3.Distance(transform.position, anchorPoints[i].position);
             if (dist < closestDist)
             {
                 closestDist = dist;
-                closestAnchor = anchor;
+                closestIndex = i;
             }
         }
 
-        if (closestAnchor != null && closestDist <= snapThreshold)
+        if (closestIndex != -1 && closestDist <= snapThreshold)
         {
             isSnapped = true;
-            currentSnapPoint = closestAnchor;
+            currentSnapPoint = anchorPoints[closestIndex];
+            currentSlot = anchorSlots[closestIndex];
+
             transform.position = currentSnapPoint.position;
+            currentSlot?.AssignCharacter(gameObject);
         }
         else
         {
@@ -80,4 +89,3 @@ public class DraggableSnap : MonoBehaviour
         isSnapped = true;
     }
 }
-

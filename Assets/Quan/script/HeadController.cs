@@ -1,79 +1,49 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
+[RequireComponent(typeof(Character))]
 public class SushiHeadController : MonoBehaviour
 {
-    public bool isAngry = false;
+    [Header("Settings")]
+    public float bounceHeight = 0.2f;
+    public float bounceSpeed = 0.4f;
+    public float angryShakeAngle = 5f;
 
-    private Tween moveTween;
-    private Tween shakeTween;
+    private Vector3 _originalPos;
+    private Tween _bounceTween;
+    private Character _character;
 
-    private Vector3 basePos;
-    private Quaternion baseRot;
-
-    private bool previousAngry = false;
-
-    void Start()
+    private void Awake()
     {
-        basePos = transform.localPosition;
-        baseRot = transform.localRotation;
+        _character = GetComponent<Character>();
+        _originalPos = transform.localPosition;
+        _character.OnCharacterDestroyed += OnDeath;
+        StartBounce();
     }
 
-    public void StartIdleMotion()
+    private void StartBounce()
     {
-        StopAllMotion();
-
-        Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOLocalMoveY(-0.2f, 0.2f).SetEase(Ease.InOutSine));
-        seq.Append(transform.DOLocalMoveY(0f, 0.2f).SetEase(Ease.InOutSine));
-        seq.AppendInterval(1f);
-        seq.SetLoops(-1);
-
-        moveTween = seq;
+        _bounceTween = transform.DOLocalMoveY(
+            _originalPos.y + bounceHeight,
+            bounceSpeed
+        ).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
     }
 
-    void StartAngryMotion()
+    public void SetAngry(bool isAngry)
     {
-        StopAllMotion();
+        _bounceTween?.Kill();
 
-        transform.localPosition = new Vector3(basePos.x, -0.3f, basePos.z);
-        transform.localRotation = Quaternion.identity;
-
-        shakeTween = transform.DOLocalRotate(new Vector3(0f, 0f, 5f), 0.05f)
-            .SetRelative(true)
-            .SetEase(Ease.InOutSine)
-            .SetLoops(-1, LoopType.Yoyo);
+        if (isAngry)
+            transform.DOShakeRotation(0.5f, new Vector3(0, 0, angryShakeAngle), 10, 90);
+        else
+            StartBounce();
     }
 
-    void StopAngryMotion()
+    private void OnDeath()
     {
-        StopAllMotion();
-
-        transform.localPosition = basePos;
-        transform.localRotation = baseRot;
+        _bounceTween?.Kill();
+        transform.DOScale(0, 0.3f).SetEase(Ease.InBack);
     }
 
-    public void StopAllMotion()
-    {
-        moveTween?.Kill();
-        shakeTween?.Kill();
-        moveTween = null;
-        shakeTween = null;
-    }
-
-    void Update()
-    {
-        if (previousAngry != isAngry)
-        {
-            previousAngry = isAngry;
-
-            if (isAngry)
-                StartAngryMotion();
-            else
-            {
-                StopAngryMotion();
-                StartIdleMotion();
-            }
-        }
-    }
+    private void OnDestroy() => _character.OnCharacterDestroyed -= OnDeath;
 }

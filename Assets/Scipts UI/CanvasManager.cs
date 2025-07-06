@@ -7,9 +7,14 @@ public class CanvasManager : MonoBehaviour
     public GameObject StartCanvas;
     public GameObject HowToPlayCanvas;
 
+    // Mảng chứa các Prefabs level
+    public GameObject[] LevelPrefabs;
+
+    // Vị trí sinh level
+    public Transform spawnPoint;
+
     void Start()
     {
-        // Đảm bảo chỉ có HomeCanvas hiển thị ban đầu
         StartCanvas.SetActive(false);
         HowToPlayCanvas.SetActive(false);
         HomeCanvas.SetActive(true);
@@ -37,5 +42,26 @@ public class CanvasManager : MonoBehaviour
         HomeCanvas.SetActive(true);
         StartCanvas.SetActive(false);
         HowToPlayCanvas.SetActive(false);
+        ClearCurrentLevel(); // Xóa level hiện tại khi quay lại
+    }
+
+    // Sinh ra level tương ứng khi nhấn nút Level
+    public void OnLevelButtonClicked(int levelIndex)
+    {
+        if (levelIndex >= 0 && levelIndex < LevelPrefabs.Length && LevelPrefabs[levelIndex] != null && spawnPoint != null)
+        {
+            ClearCurrentLevel(); // Xóa level cũ trước khi sinh level mới
+            Instantiate(LevelPrefabs[levelIndex], spawnPoint.position, Quaternion.identity);
+        }
+    }
+
+    // Hàm xóa level hiện tại (nếu có)
+    private void ClearCurrentLevel()
+    {
+        GameObject[] existingLevels = GameObject.FindGameObjectsWithTag("Level");
+        foreach (GameObject level in existingLevels)
+        {
+            Destroy(level);
+        }
     }
 }

@@ -1,79 +1,34 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
+[RequireComponent(typeof(Character))]
 public class SushiHeadController : MonoBehaviour
 {
-    public bool isAngry = false;
+    [Header("Animation Settings")]
+    public float idleBounceHeight = 0.2f;
+    public float idleBounceSpeed = 0.4f;
 
-    private Tween moveTween;
-    private Tween shakeTween;
+    private Vector3 _originalPosition;
+    private Tween _idleTween;
+    private Character _character;
 
-    private Vector3 basePos;
-    private Quaternion baseRot;
-
-    private bool previousAngry = false;
-
-    void Start()
+    private void Awake()
     {
-        basePos = transform.localPosition;
-        baseRot = transform.localRotation;
+        _character = GetComponent<Character>();
+        _originalPosition = transform.localPosition;
+        StartIdleAnimation();
     }
 
-    public void StartIdleMotion()
+    private void StartIdleAnimation()
     {
-        StopAllMotion();
-
-        Sequence seq = DOTween.Sequence();
-        seq.Append(transform.DOLocalMoveY(-0.2f, 0.2f).SetEase(Ease.InOutSine));
-        seq.Append(transform.DOLocalMoveY(0f, 0.2f).SetEase(Ease.InOutSine));
-        seq.AppendInterval(1f);
-        seq.SetLoops(-1);
-
-        moveTween = seq;
+        _idleTween = transform.DOLocalMoveY(
+            _originalPosition.y + idleBounceHeight,
+            idleBounceSpeed
+        ).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
     }
 
-    void StartAngryMotion()
+    private void OnDestroy()
     {
-        StopAllMotion();
-
-        transform.localPosition = new Vector3(basePos.x, -0.3f, basePos.z);
-        transform.localRotation = Quaternion.identity;
-
-        shakeTween = transform.DOLocalRotate(new Vector3(0f, 0f, 5f), 0.05f)
-            .SetRelative(true)
-            .SetEase(Ease.InOutSine)
-            .SetLoops(-1, LoopType.Yoyo);
-    }
-
-    void StopAngryMotion()
-    {
-        StopAllMotion();
-
-        transform.localPosition = basePos;
-        transform.localRotation = baseRot;
-    }
-
-    public void StopAllMotion()
-    {
-        moveTween?.Kill();
-        shakeTween?.Kill();
-        moveTween = null;
-        shakeTween = null;
-    }
-
-    void Update()
-    {
-        if (previousAngry != isAngry)
-        {
-            previousAngry = isAngry;
-
-            if (isAngry)
-                StartAngryMotion();
-            else
-            {
-                StopAngryMotion();
-                StartIdleMotion();
-            }
-        }
+        _idleTween?.Kill();
     }
 }

@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
     private void SpawnAllSushiWithSpacing()
     {
         spawnRoutine = StartCoroutine(SpawnSushiOneByOne());
-        SushiDotReceiver.SetRequiredSushi(sushiSpawns.Count);
+        SushiConsumer.SetRequiredSushi(sushiSpawns.Count);
     }
 
     private IEnumerator SpawnSushiOneByOne()

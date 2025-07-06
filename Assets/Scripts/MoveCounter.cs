@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public class MoveCounterManager : MonoBehaviour
@@ -8,10 +8,11 @@ public class MoveCounterManager : MonoBehaviour
 
     private int moveCount = 0;
     private bool hasLost = false;
-
     private bool hasWon = false;
 
     public static MoveCounterManager Instance;
+
+    public static System.Action<int, int> OnMoveCountChanged; // Callback khi số lượt thay đổi
 
     private void Awake()
     {
@@ -23,12 +24,13 @@ public class MoveCounterManager : MonoBehaviour
 
     public void RegisterMove()
     {
-        if (hasLost || hasWon) return; // prevent counting after win or loss
+        if (hasLost || hasWon) return; // Ngừng nếu đã thua hoặc thắng
 
         moveCount++;
         UpdateUI();
+        OnMoveCountChanged?.Invoke(moveCount, parLimit); // Gửi callback nếu có đăng ký
 
-        if (moveCount >= parLimit) // LOSE CHECK!!!
+        if (moveCount >= parLimit) // Kiểm tra thua
         {
             Debug.Log("You lose!");
             hasLost = true;

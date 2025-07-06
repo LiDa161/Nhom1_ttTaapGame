@@ -3,17 +3,15 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags:
-  - Sushi
-  - 1
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Conveyor
+  - 
   - Water
   - UI
-  - KEEP OUT
+  - 
   - 
   - 
   - 

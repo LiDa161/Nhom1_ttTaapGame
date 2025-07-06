@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class SushiDotReceiver : MonoBehaviour
 {
+    [Header("Receiver Settings")]
     public SushiShape acceptedShape;
-    public static int totalRequired;
-    private static int currentScore;
+
+    public static int totalRequired = 0;
+    private static int currentScore = 0;
+
+    public event System.Action OnSushiConsumed;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -13,24 +17,37 @@ public class SushiDotReceiver : MonoBehaviour
 
         if (controller.currentShape == acceptedShape)
         {
-            Destroy(other.gameObject);
-            currentScore++;
-
-            Debug.Log($"Accepted sushi! Score: {currentScore}/{totalRequired}");
-
-            if (currentScore >= totalRequired) // WIN CHECK!!!
-            {
-                Debug.Log("You win!");
-                MoveCounterManager.Instance.StopCountingOnWin();
-            }
+            HandleCorrectSushi(other.gameObject);
         }
         else
         {
-            Debug.Log("Wrong shape! Letting sushi pass.");
+            Debug.Log("Sushi ignored due to incorrect shape.");
         }
     }
 
-    // Call this once before starting the level to define win condition
+    private void HandleCorrectSushi(GameObject sushi)
+    {
+        Destroy(sushi);
+        currentScore++;
+        Debug.Log($"Accepted sushi! Score: {currentScore}/{totalRequired}");
+
+        OnSushiConsumed?.Invoke();
+
+        if (currentScore >= totalRequired)
+        {
+            TriggerWin();
+        }
+    }
+
+    private void TriggerWin()
+    {
+        Debug.Log("You win!");
+        MoveCounterManager.Instance.StopCountingOnWin();
+    }
+
+    /// <summary>
+    /// Call this at the beginning of the level to set the required number of correct sushi.
+    /// </summary>
     public static void SetRequiredSushi(int total)
     {
         totalRequired = total;

@@ -12,7 +12,7 @@ public class SushiSpawnInfo
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Sushi Setup")]
+    [Header("Setup")]
     public List<SushiSpawnInfo> sushiSpawns;
 
     public List<Transform> conveyorPoints;
@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     {
         playPauseButton.onClick.AddListener(TogglePlayPause);
         restartButton.onClick.AddListener(RestartGame);
+
         SpawnAllSushiWithSpacing();
     }
 
@@ -70,25 +71,31 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        if (spawnRoutine != null) StopCoroutine(spawnRoutine);
+        if (spawnRoutine != null)
+            StopCoroutine(spawnRoutine);
 
         MoveCounterManager.Instance?.ResetCounter();
 
         foreach (var sushi in currentSushis)
         {
-            if (sushi) Destroy(sushi);
+            if (sushi)
+                Destroy(sushi);
         }
 
         currentSushis.Clear();
         isPlaying = false;
         playPauseButton.image.sprite = playSprite;
 
+        // Reset all stickers to ready area
         foreach (var sticker in Object.FindObjectsByType<StickerDragHandler>(FindObjectsSortMode.None))
         {
             sticker.ResetToReady();
         }
 
+        // Respawn
         SpawnAllSushiWithSpacing();
+
+        RobotManager.Instance?.RespawnAllCustomers();
     }
 
     private void SpawnAllSushiWithSpacing()
@@ -109,7 +116,7 @@ public class GameManager : MonoBehaviour
             if (mover != null)
             {
                 mover.conveyorPoints = conveyorPoints;
-                mover.startIndexOffset = indexOffset; // ← ✅ add this
+                mover.startIndexOffset = indexOffset;
                 if (isPlaying)
                     mover.StartMoving();
             }
@@ -119,7 +126,7 @@ public class GameManager : MonoBehaviour
             }
 
             currentSushis.Add(sushi);
-            indexOffset += 2; // ← ✅ space sushi on conveyor path, not just time
+            indexOffset += 2; //space sushi on conveyor path, not just time
             yield return new WaitForSeconds(spawnDelay);
         }
     }

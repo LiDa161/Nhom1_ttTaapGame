@@ -2205,7 +2205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4625302869998646990, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_Name
-      value: Catcher
+      value: CatcherTriangle
       objectReference: {fileID: 0}
     - target: {fileID: 7476574612555305359, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_SortingOrder
@@ -2844,7 +2844,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4625302869998646990, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_Name
-      value: Catcher
+      value: CatcherCircle
       objectReference: {fileID: 0}
     - target: {fileID: 7476574612555305359, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_SortingOrder
@@ -3091,7 +3091,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4625302869998646990, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_Name
-      value: Catcher
+      value: CatcherSquare
       objectReference: {fileID: 0}
     - target: {fileID: 7476574612555305359, guid: 2e073bd017f32ca499722ddae386039e, type: 3}
       propertyPath: m_SortingOrder

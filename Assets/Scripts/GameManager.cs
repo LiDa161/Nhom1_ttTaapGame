@@ -1,86 +1,126 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+[System.Serializable]
+public class SushiSpawnInfo
+{
+    public GameObject sushiPrefab;
+    public Transform spawnPoint;
+}
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Prefabs và Vị trí")]
-    public GameObject sushiPrefab;
-    public List<Transform> sushiSpawnPoints;
+    [Header("Sushi Setup")]
+    public List<SushiSpawnInfo> sushiSpawns;
+
     public List<Transform> conveyorPoints;
+    public float spawnDelay = 0.5f;
 
     [Header("UI")]
     public Button playPauseButton;
+
     public Button restartButton;
     public Sprite playSprite;
     public Sprite pauseSprite;
 
-    private GameObject currentSushi;
-    private BoxMover currentMover;
+    private List<GameObject> currentSushis = new List<GameObject>();
     private bool isPlaying = false;
-    private int currentLevel = 0;
+    private Coroutine spawnRoutine;
+    private Coroutine gameTickRoutine;
 
-    void Start()
+    private void Start()
     {
         playPauseButton.onClick.AddListener(TogglePlayPause);
         restartButton.onClick.AddListener(RestartGame);
-        SpawnSushi();
+        SpawnAllSushiWithSpacing();
     }
 
-    void TogglePlayPause()
+    private void TogglePlayPause()
     {
-        if (currentMover == null)
-        {
-            Debug.LogWarning("Không có sushi để điều khiển.");
-            return;
-        }
-
         isPlaying = !isPlaying;
 
         if (isPlaying)
         {
-            currentMover.StartMoving();
+            foreach (var sushi in currentSushis)
+                sushi.GetComponent<BoxMover>().StartMoving();
+
+            gameTickRoutine = StartCoroutine(GameTickRoutine()); // start ticking
             playPauseButton.image.sprite = pauseSprite;
         }
         else
         {
-            currentMover.StopMoving();
+            foreach (var sushi in currentSushis)
+                sushi.GetComponent<BoxMover>().StopMoving();
+
+            if (gameTickRoutine != null) StopCoroutine(gameTickRoutine); // stop ticking
             playPauseButton.image.sprite = playSprite;
         }
     }
 
-    void RestartGame()
+    private IEnumerator GameTickRoutine()
     {
-        if (currentSushi != null)
+        while (isPlaying)
         {
-            Destroy(currentSushi);
-            currentMover = null;
+            MoveCounterManager.Instance?.RegisterMove();
+            yield return new WaitForSeconds(0.5f);
         }
-
-        isPlaying = false;
-        playPauseButton.image.sprite = playSprite;
-        SpawnSushi();
     }
 
-    void SpawnSushi()
+    public void RestartGame()
     {
-        if (currentLevel >= sushiSpawnPoints.Count)
+        if (spawnRoutine != null) StopCoroutine(spawnRoutine);
+
+        MoveCounterManager.Instance?.ResetCounter();
+
+        foreach (var sushi in currentSushis)
         {
-            Debug.LogError("Không có vị trí spawn cho level hiện tại!");
-            return;
+            if (sushi) Destroy(sushi);
         }
 
-        Transform spawnPoint = sushiSpawnPoints[currentLevel];
-        currentSushi = Instantiate(sushiPrefab, spawnPoint.position, Quaternion.identity);
-        currentMover = currentSushi.GetComponent<BoxMover>();
+        currentSushis.Clear();
+        isPlaying = false;
+        playPauseButton.image.sprite = playSprite;
 
-        if (currentMover != null)
+        foreach (var sticker in Object.FindObjectsByType<StickerDragHandler>(FindObjectsSortMode.None))
         {
-            currentMover.conveyorPoints = conveyorPoints;
+            sticker.ResetToReady();
         }
-        else
+
+        SpawnAllSushiWithSpacing();
+    }
+
+    private void SpawnAllSushiWithSpacing()
+    {
+        spawnRoutine = StartCoroutine(SpawnSushiOneByOne());
+        SushiDotReceiver.SetRequiredSushi(sushiSpawns.Count);
+    }
+
+    private IEnumerator SpawnSushiOneByOne()
+    {
+        int indexOffset = 0;
+
+        foreach (var info in sushiSpawns)
         {
-            Debug.LogError("Prefab Sushi thiếu BoxMover!");
+            GameObject sushi = Instantiate(info.sushiPrefab, info.spawnPoint.position, Quaternion.identity);
+            var mover = sushi.GetComponent<BoxMover>();
+
+            if (mover != null)
+            {
+                mover.conveyorPoints = conveyorPoints;
+                mover.startIndexOffset = indexOffset; // ← ✅ add this
+                if (isPlaying)
+                    mover.StartMoving();
+            }
+            else
+            {
+                Debug.LogError("Sushi prefab is missing BoxMover.");
+            }
+
+            currentSushis.Add(sushi);
+            indexOffset += 2; // ← ✅ space sushi on conveyor path, not just time
+            yield return new WaitForSeconds(spawnDelay);
         }
     }
 }

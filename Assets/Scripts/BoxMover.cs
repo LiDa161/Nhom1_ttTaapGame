@@ -8,9 +8,11 @@ public class BoxMover : MonoBehaviour
     public List<Transform> conveyorPoints;
     public float moveInterval = 0.5f;
     public float moveDuration = 0.2f;
+    public int startIndexOffset = 0;
 
     private int currentIndex = 0;
     private bool isMoving = false;
+    private bool hasReportedThisStep = false;
 
     public void StartMoving()
     {
@@ -22,6 +24,8 @@ public class BoxMover : MonoBehaviour
             return;
         }
 
+        currentIndex = startIndexOffset % conveyorPoints.Count;
+
         isMoving = true;
         StartCoroutine(MoveRoutine());
     }
@@ -32,13 +36,14 @@ public class BoxMover : MonoBehaviour
         StopAllCoroutines();
     }
 
-    IEnumerator MoveRoutine()
+    private IEnumerator MoveRoutine()
     {
         while (isMoving)
         {
             currentIndex = (currentIndex + 1) % conveyorPoints.Count;
             Transform nextPoint = conveyorPoints[currentIndex];
             transform.DOMove(nextPoint.position, moveDuration);
+
             yield return new WaitForSeconds(moveInterval);
         }
     }

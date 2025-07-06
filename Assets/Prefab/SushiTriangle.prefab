@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 4910473581843856057}
   - component: {fileID: 3390566867348638686}
   - component: {fileID: 8918886735256540680}
+  - component: {fileID: 7625427487558195283}
   - component: {fileID: 8976534055250719454}
-  m_Layer: 0
-  m_Name: box move 1
+  m_Layer: 6
+  m_Name: SushiTriangle
   m_TagString: Sushi
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 6820dddbe73315f4d940b3736fcfc6ec, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c79a373e4878b8242ba1a2505129925a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -155,7 +156,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.89666665, y: 1.05}
+    oldSize: {x: 0.8933333, y: 1.05}
     newSize: {x: 1.0507812, y: 1.2304688}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -163,6 +164,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.89666665, y: 1.05}
   m_EdgeRadius: 0
+--- !u!114 &7625427487558195283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1950195131552976977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f67d41ebc7ae8b40994028ad4b905f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squareSprite: {fileID: 21300000, guid: 336128c9e0fe3a849850853eb38ddb11, type: 3}
+  circleSprite: {fileID: 21300000, guid: c7d15a32f4be2bb46bc26028417fac99, type: 3}
+  triangleSprite: {fileID: 21300000, guid: c79a373e4878b8242ba1a2505129925a, type: 3}
+  currentShape: 2
 --- !u!114 &8976534055250719454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,3 +195,4 @@ MonoBehaviour:
   conveyorPoints: []
   moveInterval: 0.5
   moveDuration: 0.2
+  startIndexOffset: 0

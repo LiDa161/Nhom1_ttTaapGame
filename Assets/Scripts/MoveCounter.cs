@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.UI; // Thêm để sử dụng UI Image
 using TMPro;
 
 public class MoveCounterManager : MonoBehaviour
@@ -8,6 +9,8 @@ public class MoveCounterManager : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI moveCounterText;
+    public GameObject losePanel; // Panel hiển thị thông báo Lose
+    public Image loseImage; // Image hiển thị ảnh Lose
 
     public static MoveCounterManager Instance;
 
@@ -19,6 +22,15 @@ public class MoveCounterManager : MonoBehaviour
     {
         Instance = this;
         ResetCounter();
+    }
+
+    private void Start()
+    {
+        // Ẩn panel lose khi bắt đầu
+        if (losePanel != null)
+        {
+            losePanel.SetActive(false);
+        }
     }
 
     public void RegisterMove()
@@ -45,6 +57,11 @@ public class MoveCounterManager : MonoBehaviour
         hasLost = false;
         hasWon = false;
         UpdateUI();
+        // Ẩn panel lose khi reset
+        if (losePanel != null)
+        {
+            losePanel.SetActive(false);
+        }
     }
 
     public bool ParLimitReached()
@@ -56,6 +73,12 @@ public class MoveCounterManager : MonoBehaviour
     {
         Debug.Log("You lose!");
         hasLost = true;
+        // Hiển thị panel với ảnh Lose
+        if (losePanel != null && loseImage != null)
+        {
+            losePanel.SetActive(true);
+            loseImage.enabled = true; // Đảm bảo ảnh được bật
+        }
         StopAllSushiMovement();
         Invoke(nameof(RestartGameBecauseFail), 2f);
     }
